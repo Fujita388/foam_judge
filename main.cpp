@@ -46,7 +46,6 @@ void gas_volume(double d, double thresh) {
 			/////座標データから密度計算/////
 			if (i_step == num_atoms) {
 				fill(density.begin(), density.end(), 0);  // densityを0で初期化
-				int gas = 0;  // 閾値以下のセルを気泡としてカウント
 				for (int i = 0; i < num_atoms; i++) {
 					int mx = int(pos_data[i][0] / d);
 					int my = int(pos_data[i][1] / d);
@@ -67,12 +66,12 @@ void gas_volume(double d, double thresh) {
 				int z_bottom = 0;
 				for (int i = 0; i < 21; i++) {
 					for (int j = 0; j < 21; j++) {
-						if (density[0+i*21+j*21*21] <= 0.1) x_up += 1;
-						if (density[i+0*21+j*21*21] <= 0.1) y_up += 1;
-						if (density[i+j*21+0*21*21] <= 0.1) z_up += 1;
-						if (density[21+i*21+j*21*21] <= 0.1) x_bottom += 1;
-						if (density[i+21*21+j*21*21] <= 0.1) y_bottom += 1;
-						if (density[i+j*21+21*21*21] <= 0.1) z_bottom += 1;
+						if (density[0+i*21+j*21*21] <= thresh) x_up += 1;
+						if (density[i+0*21+j*21*21] <= thresh) y_up += 1;
+						if (density[i+j*21+0*21*21] <= thresh) z_up += 1;
+						if (density[21+i*21+j*21*21] <= thresh) x_bottom += 1;
+						if (density[i+21*21+j*21*21] <= thresh) y_bottom += 1;
+						if (density[i+j*21+21*21*21] <= thresh) z_bottom += 1;
 					}
 				}
 
