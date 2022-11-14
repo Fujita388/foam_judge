@@ -58,17 +58,27 @@ void gas_volume(double d, double thresh) {
 					density[i_density] += 1.0 / V;
 				}
 
-				// 上下(z=0とz=21)のセルの10%以上が気泡となった時、気泡破壊と判定する
-				int check_up = 0;  // z=0のセルを気泡かどうかを判定
-				int check_bottom = 0;  // z=21のセルを気泡かどうかを判定
+				// 上下(x,y,z=0とx,y,z=21)のセルの10%以上が気泡となった時、気泡破壊と判定する
+				int x_up = 0;  // x=0のセルを気泡かどうかを判定
+				int y_up = 0;
+				int z_up = 0;
+				int x_bottom = 0;  // x=21のセルを気泡かどうかを判定
+				int y_bottom = 0;
+				int z_bottom = 0;
 				for (int i = 0; i < 21; i++) {
 					for (int j = 0; j < 21; j++) {
-						if (density[i+j*21+0*21*21] <= 0.1) check_up += 1;
-						if (density[i+j*21+21*21*21] <= 0.1) check_bottom += 1;
+						if (density[0+i*21+j*21*21] <= 0.1) x_up += 1;
+						if (density[i+0*21+j*21*21] <= 0.1) y_up += 1;
+						if (density[i+j*21+0*21*21] <= 0.1) z_up += 1;
+						if (density[21+i*21+j*21*21] <= 0.1) x_bottom += 1;
+						if (density[i+21*21+j*21*21] <= 0.1) y_bottom += 1;
+						if (density[i+j*21+21*21*21] <= 0.1) z_bottom += 1;
 					}
 				}
 
-				if (check_up / (21 * 21) >= 0.1 && check_bottom / (21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
+				if (x_up / (21 * 21) >= 0.1 && x_bottom / (21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
+				else if (y_up / (21 * 21) >= 0.1 && y_bottom / (21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
+				else if (z_up / (21 * 21) >= 0.1 && z_bottom / (21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
 				else ofile << "Not rupture" << '\n';
 
 				i_step = 0;  // i_stepを初期化
