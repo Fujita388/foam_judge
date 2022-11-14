@@ -75,9 +75,9 @@ void gas_volume(double d, double thresh) {
 					}
 				}
 
-				if (x_up / (21 * 21) >= 0.1 && x_bottom / (21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
-				else if (y_up / (21 * 21) >= 0.1 && y_bottom / (21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
-				else if (z_up / (21 * 21) >= 0.1 && z_bottom / (21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
+				if (double(x_up) / double(21 * 21) >= 0.1 && double(x_bottom) / double(21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
+				else if (double(y_up) / double(21 * 21) >= 0.1 && double(y_bottom) / double(21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
+				else if (double(z_up) / double(21 * 21) >= 0.1 && double(z_bottom) / double(21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
 				else ofile << "Not rupture" << '\n';
 
 				i_step = 0;  // i_stepを初期化
