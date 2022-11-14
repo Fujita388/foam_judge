@@ -10,12 +10,6 @@
 using namespace std;
 
 
-int index_of_density(int mx, int my, int mz) {
-	int index = mx + my * 21 + mz * 21 * 21;  // 密度データの中でのインデックス
-	return index;
-}
-
-
 // 気泡破壊を判定する関数
 void gas_volume(double d, double thresh) {
 	ifstream ifile("rescale.lammpstrj");  // 読み込むファイルのパスを指定
