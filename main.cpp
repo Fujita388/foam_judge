@@ -63,15 +63,20 @@ void gas_volume(double d, double thresh) {
 					int i_density = mx + my * Lx + mz * Lx * Ly;  // 密度データの中でのインデックス
 					density[i_density] += 1.0 / V;
 				}
-				int rupture_check = 0;  // 気泡破壊を判定
-				//条件1:density[0+11*21+11*21*21]<=0.1 かつ density[21+11*21+11*21*21]<=0.1
-				if (density[0+11*21+11*21*21]<=0.1 && density[21+11*21+11*21*21]<=0.1) rupture_check += 1;
-				//条件2:density[11+0*21+11*21*21]<=0.1 かつ density[11+21*21+11*21*21]<=0.1
-				if (density[11+0*21+11*21*21]<=0.1 && density[11+21*21+11*21*21]<=0.1) rupture_check += 1;
-				//条件3:density[11+11*21+0*21*21]<=0.1 かつ density[11+11*21+21*21*21]<=0.1
-				if (density[11+11*21+0*21*21]<=0.1 && density[11+11*21+21*21*21]<=0.1) rupture_check += 1;
-				if (rupture_check == 0) ofile << "NOT rupture" << '\n';
-				if (rupture_check != 0) ofile << "YES rupture" << '\n';
+
+				// 上下(z=0とz=21)のセルの10%以上が気泡となった時、気泡破壊と判定する
+				int check_up = 0;  // z=0のセルを気泡かどうかを判定
+				int check_bottom = 0;  // z=21のセルを気泡かどうかを判定
+				for (int i = 0; i < 21; i++) {
+					for (int j = 0; j < 21; j++) {
+						if (density[i+j*21+0*21*21] <= 0.1) check_up += 1;
+						if (density[i+j*21+21*21*21] <= 0.1) check_bottom += 1;
+					}
+				}
+
+				if (check_up / (21 * 21) >= 0.1 && check_bottom / (21 * 21) >= 0.1) ofile << "Yes rupture" << '\n';
+				else ofile << "Not rupture" << '\n';
+
 				i_step = 0;  // i_stepを初期化
 			}
 		}
