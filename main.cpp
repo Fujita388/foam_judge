@@ -117,7 +117,7 @@ void gas_volume(double d, double thresh, std::string input_file, std::string out
   static double pos_data[N][3];  // 1stepあたりの粒子の座標データの配列
   int frame = 0;
 
-  while (getline(ifile, str_dump)) {  // ifileを1行ずつstr_dumpに読み込む
+  while (getline(ifile, str_dump) and frame < 3) {  // ifileを1行ずつstr_dumpに読み込む
     if (i_dump == 3) {
       num_atoms = stoi(str_dump);  
     }
@@ -146,7 +146,6 @@ void gas_volume(double d, double thresh, std::string input_file, std::string out
         save_vtk(frame, Lx, Ly, Lz, density);
         i_step = 0;  // i_stepを初期化
         frame++;
-        if(frame == 3)return;
       }
     }
     i_dump += 1;
