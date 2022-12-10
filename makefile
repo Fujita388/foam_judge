@@ -1,12 +1,9 @@
-CPPFLAGS=-std=c++11
-CPPFILE=main.cpp split.cpp
-OFILE=main.o split.o
+CPPFLAGS=-std=c++11 -O3 
 
-all: o
+all: a.out
 
-o:
-	$(CXX) -c $(CPPFLAGS) $(CPPFILE)
-	$(CXX) $(CPPFLAGS) $(OFILE)
+a.out: main.cpp
+	$(CXX) $(CPPFLAGS) $<
 
 clean:
 	$(RM) *.o a.out *.lammps foam_judge.o* foam_judge.e* *.log *.dat
