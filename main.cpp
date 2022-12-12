@@ -26,7 +26,7 @@ std::vector<std::string> mysplit(std::string &str) {
 
 void save_vtk(int frame, int Lx, int Ly, int Lz, std::vector<double> &density) {
   char filename[1000];
-  sprintf(filename, "test%03d.vtk", frame);
+  sprintf(filename, "rescale%03d.vtk", frame);
   std::cout << filename << std::endl;
   std::ofstream ofs(filename);
   ofs << "# vtk DataFile Version 1.0" << std::endl;
@@ -68,7 +68,7 @@ int index2pos(int x, int y, int z, int Lx, int Ly) {
 }
 
 //破壊をチェックする関数
-bool check_rapture(int Lx, int Ly, int Lz, std::vector<double> &density, double thresh) {
+bool check_rupture(int Lx, int Ly, int Lz, std::vector<double> &density, double thresh) {
   // 上下(x,y,z=0とx,y,z=84)のセルの10%以上が気泡となった時、気泡破壊と判定する
   int x_up = 0; // x=0のセルを気泡かどうかを判定
   int y_up = 0;
@@ -81,24 +81,23 @@ bool check_rapture(int Lx, int Ly, int Lz, std::vector<double> &density, double 
       if (density[index2pos(0, i, j, Lx, Ly)] <= thresh) x_up += 1;
       if (density[index2pos(i, 0, j, Lx, Ly)] <= thresh) y_up += 1;
       if (density[index2pos(i, j, 0, Lx, Ly)] <= thresh) z_up += 1;
-      if (density[index2pos(Lx - 0, i, j, Lx, Ly)] <= thresh) x_bottom += 1;
+      if (density[index2pos(Lx - 1, i, j, Lx, Ly)] <= thresh) x_bottom += 1;
       if (density[index2pos(i, Ly - 1, j, Lx, Ly)] <= thresh) y_bottom += 1;
       if (density[index2pos(i, j, Lz - 1, Lx, Ly)] <= thresh) z_bottom += 1;
     }
   }
 
-  double x_up_density = static_cast<double>(x_up) / Ly * Lz;
-  double x_bottom_density = static_cast<double>(x_bottom) / Ly * Ly;
-  double y_up_density = static_cast<double>(y_up) / Lz * Lx;
-  double y_bottom_density = static_cast<double>(y_bottom) / Lz * Lx;
-  double z_up_density = static_cast<double>(z_up) / Lx * Ly;
-  double z_bottom_density = static_cast<double>(z_bottom) / Lx * Ly;
+  double x_up_density = static_cast<double>(x_up) / (Ly * Lz);
+  double x_bottom_density = static_cast<double>(x_bottom) / (Ly * Lz);
+  double y_up_density = static_cast<double>(y_up) / (Lz * Lx);
+  double y_bottom_density = static_cast<double>(y_bottom) / (Lz * Lx);
+  double z_up_density = static_cast<double>(z_up) / (Lx * Ly);
+  double z_bottom_density = static_cast<double>(z_bottom) / (Lx * Ly);
 
   if (x_up_density >= 0.1 && x_bottom_density >= 0.1) return true;
-  if (y_up_density >= 0.1 && y_bottom_density >= 0.1) return true;
-  if (z_up_density >= 0.1 && z_bottom_density >= 0.1) return true;
-
-  return false;
+  else if (y_up_density >= 0.1 && y_bottom_density >= 0.1) return true;
+  else if (z_up_density >= 0.1 && z_bottom_density >= 0.1) return true;
+  else return false;
 }
 
 // 気泡破壊を判定する関数
@@ -118,7 +117,7 @@ void gas_volume(double d, double thresh, std::string input_file, std::string out
   int frame = 0;
 
   // ifileを1行ずつstr_dumpに読み込む
-  while (getline(ifile, str_dump) && frame < 10) { // とりあえず10フレームだけ処理する(全部処理したい場合は消すこと)
+  while (getline(ifile, str_dump)) {
     if (i_dump == 3) {
       num_atoms = stoi(str_dump);
     }
@@ -139,10 +138,10 @@ void gas_volume(double d, double thresh, std::string input_file, std::string out
       if (i_step == num_atoms) {
         std::cout << "Frame: " << frame << std::endl;
         auto density = calc_density(pos_data, num_atoms, V, Lx, Ly, Lz, d);
-        if (check_rapture(Lx, Ly, Lz, density, thresh)) {
-          ofile << "Yes Rapture" << std::endl;
+        if (check_rupture(Lx, Ly, Lz, density, thresh)) {
+          ofile << "Yes Rupture" << std::endl;
         } else {
-          ofile << "Not Rapture" << std::endl;
+          ofile << "Not Rupture" << std::endl;
         }
         save_vtk(frame, Lx, Ly, Lz, density);
         i_step = 0; // i_stepを初期化

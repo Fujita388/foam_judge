@@ -6,3 +6,4 @@ a.out
 *.log
 foam_judge.e*
 foam_judge.o*
+*.vtk
